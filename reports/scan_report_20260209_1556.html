@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OWASP Web Scanner Report</title>
+    <style>
+        body { font-family: Arial; background:#111; color:#eee }
+        h1 { color:#ff4c4c }
+        .finding { border:1px solid #444; padding:15px; margin:10px 0 }
+        .critical { color:red }
+        .high { color:orange }
+        .medium { color:yellow }
+    </style>
+</head>
+<body>
+<h1>OWASP Web Vulnerability Scan Report</h1>
+
+
+<div class="finding">
+    <h2 class="critical">SQL Injection</h2>
+    <p><b>Endpoint:</b> /products?id=1</p>
+    <p><b>Payload:</b> 1' OR '1'='1</p>
+    <p><b>Impact:</b> Database compromise</p>
+    <p><b>CVSS Score:</b> 9.1</p>
+    <p><b>Remediation:</b> Use parameterized queries</p>
+</div>
+
+<div class="finding">
+    <h2 class="medium">Reflected XSS</h2>
+    <p><b>Endpoint:</b> /search?q=test</p>
+    <p><b>Payload:</b> <script>alert(1)</script></p>
+    <p><b>Impact:</b> Session hijacking</p>
+    <p><b>CVSS Score:</b> 6.5</p>
+    <p><b>Remediation:</b> Escape output and use CSP</p>
+</div>
+
+
+</body>
+</html>
