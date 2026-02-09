@@ -10,25 +10,27 @@ class XSSScanner:
     def __init__(self, session: requests.Session):
         self.session = session
 
-    def scan_reflected(self, url, params):
-        findings = []
+    def scan_reflected(self, url, params, log):
+        log(f"[XSS] scan_reflected() entered for {url}")
+
+        if not params:
+            log("[XSS] No parameters → skipping")
+            return
+
+        payload = "<script>alert(1)</script>"
 
         for k in params:
-            for payload in XSS_PAYLOADS:
-                test_params = params.copy()
-                test_params[k] = payload
+            log(f"[XSS] Injecting param {k}")
+            test = params.copy()
+            test[k] = payload
 
-                r = self.session.get(url, params=test_params)
+            r = self.session.get(url, params=test)
+            if payload in r.text:
+                log(f"[XSS][VULNERABLE] param={k}")
+                return
 
-                if payload in r.text:
-                    findings.append({
-                        "type": "Reflected XSS",
-                        "param": k,
-                        "payload": payload,
-                        "url": url
-                    })
-
-        return findings
+        log("[XSS] scan_reflected() finished → NOT vulnerable")
+ 
 
     def scan_basic_stored(self, submit_url, params):
         injected = False

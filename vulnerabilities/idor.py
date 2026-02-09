@@ -4,24 +4,26 @@ class IDORScanner:
     def __init__(self, session: requests.Session):
         self.session = session
 
-    def scan(self, url, params):
-        findings = []
+    def scan(self, url, params, log):
+        log(f"[IDOR] scan() entered for {url}")
+
+        if not params:
+            log("[IDOR] No parameters → skipping")
+            return
 
         for k, v in params.items():
-            if v.isdigit():
-                original = self.session.get(url, params=params)
-                test_params = params.copy()
-                test_params[k] = str(int(v) + 1)
+            if not v.isdigit():
+                log(f"[IDOR] {k} not numeric → skipping")
+                continue
 
-                test = self.session.get(url, params=test_params)
+            log(f"[IDOR] Testing {k}")
+            test = params.copy()
+            test[k] = str(int(v) + 1)
 
-                if test.status_code == 200 and test.text != original.text:
-                    findings.append({
-                        "type": "IDOR",
-                        "param": k,
-                        "original": v,
-                        "tested": test_params[k],
-                        "url": url
-                    })
+            r = self.session.get(url, params=test)
+            if r.status_code == 200:
+                log(f"[IDOR][POTENTIAL] param={k}")
+                return
 
-        return findings
+        log("[IDOR] scan() finished → NOT vulnerable")
+

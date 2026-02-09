@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OWASP Scanner Dashboard</title>
+    <script src="/static/main.js"></script>
+    <style>
+        body { background:#0f172a; color:#e5e7eb; font-family:Arial }
+        input, button { padding:10px; margin:5px }
+        #log { background:#020617; padding:15px; height:400px; overflow:auto }
+    </style>
+</head>
+<body>
+
+<h1>OWASP Web Vulnerability Scanner</h1>
+
+<input id="url" placeholder="Target URL">
+<input id="jwt" placeholder="JWT (optional)">
+<button onclick="startScan()">Start Full Scan</button>
+
+<h2>Live Output</h2>
+<div id="log"></div>
+
+</body>
+</html>

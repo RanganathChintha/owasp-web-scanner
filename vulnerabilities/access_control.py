@@ -13,18 +13,16 @@ class AccessControlScanner:
         self.session = session
         self.base_url = base_url
 
-    def scan_forced_browsing(self):
-        findings = []
+    def scan_forced_browsing(self, log):
+        log("[ACCESS] scan_forced_browsing() entered")
 
-        for path in SENSITIVE_PATHS:
-            url = self.base_url.rstrip("/") + path
+        for path in ["/admin", "/dashboard"]:
+            url = self.base_url + path
+            log(f"[ACCESS] Trying {url}")
+
             r = self.session.get(url)
+            if r.status_code == 200:
+                log(f"[ACCESS][VULNERABLE] {url}")
+                return
 
-            if r.status_code == 200 and "login" not in r.text.lower():
-                findings.append({
-                    "type": "Broken Access Control",
-                    "url": url,
-                    "issue": "Forced browsing"
-                })
-
-        return findings
+        log("[ACCESS] No forced browsing issues")

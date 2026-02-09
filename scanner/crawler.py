@@ -25,7 +25,9 @@ class Crawler:
 
         try:
             response = self.session.get(url, timeout=TIMEOUT)
-            response.raise_for_status()  # Raise exception for HTTP errors
+            if response.status_code >= 400:
+                return
+ # Raise exception for HTTP errors
         except (requests.RequestException, requests.HTTPError) as e:
             print(f"Error crawling {url}: {e}")
             return

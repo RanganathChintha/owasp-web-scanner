@@ -1,32 +1,34 @@
 import argparse
-from reports.report_generator import ReportGenerator
+from scanner.crawler import Crawler
+from exploits.sqli_exploit import SQLiExploit
+from exploits.xss_exploit import XSSExploit
+from exploits.jwt_attack import JWTAttack
 
 def main():
     parser = argparse.ArgumentParser(description="OWASP Web Vulnerability Scanner")
-    parser.add_argument("--report", action="store_true", help="Generate demo report")
+    parser.add_argument("-u", "--url", required=True)
+    parser.add_argument("--exploit-sqli", nargs=2, metavar=("URL", "PARAM"))
+    parser.add_argument("--exploit-xss", nargs=2, metavar=("URL", "PARAM"))
+    parser.add_argument("--exploit-jwt", help="JWT token")
     args = parser.parse_args()
 
-    if args.report:
-        report = ReportGenerator()
-        report.add_finding(
-            "SQL Injection",
-            "/products?id=1",
-            "1' OR '1'='1",
-            "Database compromise",
-            9.1,
-            "Use parameterized queries"
-        )
-        report.add_finding(
-            "Reflected XSS",
-            "/search?q=test",
-            "<script>alert(1)</script>",
-            "Session hijacking",
-            6.5,
-            "Escape output and use CSP"
-        )
+    crawler = Crawler(args.url)
+    crawler.crawl()
 
-        file = report.generate_html()
-        print("[+] Report generated:", file)
+    if args.exploit_sqli:
+        sqli = SQLiExploit(crawler.session)
+        result = sqli.exploit(args.exploit_sqli[0], args.exploit_sqli[1])
+        print("[EXPLOIT][SQLi]", result)
+
+    if args.exploit_xss:
+        xss = XSSExploit(crawler.session)
+        result = xss.exploit(args.exploit_xss[0], args.exploit_xss[1])
+        print("[EXPLOIT][XSS]", result)
+
+    if args.exploit_jwt:
+        jwtatk = JWTAttack()
+        print("[EXPLOIT][JWT][alg=none]")
+        print(jwtatk.privilege_escalation(args.exploit_jwt))
 
 if __name__ == "__main__":
     main()
