@@ -1,0 +1,3 @@
+USER_AGENT = "OWASP-Web-Scanner/1.0"
+TIMEOUT = 10
+MAX_DEPTH = 2
